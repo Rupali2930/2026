@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,28 +15,33 @@
       --warning: #ffd88a;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #020615 0%, #040b21 45%, #030914 100%);
+      background: #020615;
       overflow-x: hidden;
     }
 
     .sky-layer {
       position: fixed;
       inset: 0;
+      z-index: -4;
+      pointer-events: none;
+    }
+
+    #nebula-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       z-index: -3;
       pointer-events: none;
-      background:
-        radial-gradient(70% 35% at 20% 18%, rgba(120, 160, 255, 0.16), transparent 70%),
-        radial-gradient(65% 30% at 70% 12%, rgba(255, 225, 255, 0.16), transparent 72%),
-        radial-gradient(95% 32% at 50% 28%, rgba(148, 187, 255, 0.22), transparent 74%);
-      filter: blur(16px);
-      animation: nebulaShift 28s ease-in-out infinite alternate;
     }
 
     .horizon {
@@ -61,8 +67,15 @@
     }
 
     @keyframes nebulaShift {
-      from { transform: translateX(-2%) translateY(-1%) scale(1); opacity: .76; }
-      to { transform: translateX(3%) translateY(1%) scale(1.05); opacity: 1; }
+      from {
+        transform: translateX(-2%) translateY(-1%) scale(1);
+        opacity: .76;
+      }
+
+      to {
+        transform: translateX(3%) translateY(1%) scale(1.05);
+        opacity: 1;
+      }
     }
 
     #stars {
@@ -75,9 +88,9 @@
     }
 
     .app {
-      width: min(960px, 94vw);
+      width: min(680px, 92vw);
       margin: 2rem auto;
-      padding: 1.2rem;
+      padding: 1rem;
     }
 
     .panel {
@@ -88,18 +101,134 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 18px 45px rgba(5, 9, 25, 0.38);
       padding: 1.4rem;
-      animation: rise .45s ease;
+      position: relative;
+      z-index: 10;
+      animation: rise .5s cubic-bezier(.22, .68, .36, 1.2);
     }
 
-    .panel.active { display: block; }
+    .panel.active {
+      display: block;
+    }
 
     @keyframes rise {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    h1, h2, h3 { margin: 0.4rem 0 0.8rem; }
-    p { line-height: 1.5; opacity: 0.95; }
+    /* Star streak - CSS animated horizontal shooting stars */
+    .star-streak {
+      position: fixed;
+      pointer-events: none;
+      z-index: -1;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 6px 2px rgba(180, 220, 255, 0.8), 0 0 14px 4px rgba(123, 200, 255, 0.4);
+      animation: streakAcross 5s linear forwards;
+    }
+
+    .star-streak::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      transform-origin: 100% 50%;
+      transform: translateY(-50%) rotate(-15deg);
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(to left, rgba(200, 230, 255, 0.7), rgba(150, 200, 255, 0.3) 40%, transparent);
+      border-radius: 2px;
+    }
+
+    @keyframes streakAcross {
+      0% {
+        left: -100px;
+        top: var(--start-y);
+        opacity: 0;
+      }
+
+      5% {
+        opacity: 1;
+      }
+
+      85% {
+        opacity: 1;
+      }
+
+      100% {
+        left: 110vw;
+        top: calc(var(--start-y) + 75vh);
+        opacity: 0;
+      }
+    }
+
+
+
+    #star-container {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      /* Mask out the center where the panel is */
+      mask-image: radial-gradient(ellipse 360px 500px at center, transparent 0%, transparent 60%, black 100%);
+      -webkit-mask-image: radial-gradient(ellipse 360px 400px at center, transparent 0%, transparent 70%, black 95%);
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), #b28dff);
+      border-radius: 0 2px 2px 0;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 12px rgba(123, 232, 255, 0.5);
+    }
+
+    /* Typewriter cursor */
+    .typewriter-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      animation: blink 0.7s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0.4rem 0 0.8rem;
+    }
+
+    p {
+      line-height: 1.5;
+      opacity: 0.95;
+    }
 
     .lead {
       font-size: clamp(1rem, 2.4vw, 1.15rem);
@@ -125,14 +254,19 @@
       transition: transform .15s ease, box-shadow .15s ease;
     }
 
-    button:hover { transform: translateY(-1px) scale(1.01); }
-    button:active { transform: translateY(1px) scale(.99); }
+    button:hover {
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(.99);
+    }
 
     .subtle {
       background: rgba(255, 255, 255, 0.1);
       color: var(--text);
       box-shadow: none;
-      border: 1px solid rgba(255,255,255,.2);
+      border: 1px solid rgba(255, 255, 255, .2);
     }
 
     .hud {
@@ -147,8 +281,13 @@
       font-weight: 550;
     }
 
-    .ok { color: var(--success); }
-    .warn { color: var(--warning); }
+    .ok {
+      color: var(--success);
+    }
+
+    .warn {
+      color: var(--warning);
+    }
 
     .selector-grid {
       display: grid;
@@ -158,9 +297,9 @@
     }
 
     .game-option {
-      border: 1px solid rgba(255,255,255,.2);
+      border: 1px solid rgba(255, 255, 255, .2);
       border-radius: 12px;
-      background: rgba(255,255,255,.08);
+      background: rgba(255, 255, 255, .08);
       padding: .7rem;
       display: flex;
       align-items: center;
@@ -169,13 +308,19 @@
       user-select: none;
     }
 
-    .game-option input { accent-color: #8ce7ff; }
-    .tiny { font-size: .86rem; opacity: .88; }
+    .game-option input {
+      accent-color: #8ce7ff;
+    }
+
+    .tiny {
+      font-size: .86rem;
+      opacity: .88;
+    }
 
     #star-game {
       position: relative;
       width: 100%;
-      height: 360px;
+      height: 220px;
       overflow: hidden;
       border-radius: 14px;
       border: 1px dashed rgba(155, 225, 255, 0.35);
@@ -198,14 +343,21 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.18); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.18);
+      }
     }
 
     #constellation {
       width: 100%;
-      max-width: 700px;
-      height: min(52vw, 420px);
+      max-width: 550px;
+      height: min(40vw, 260px);
       border-radius: 14px;
       border: 1px dashed rgba(155, 225, 255, 0.35);
       background: rgba(1, 4, 18, .55);
@@ -215,34 +367,89 @@
 
     .memory-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(68px, 1fr));
-      gap: .7rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .6rem;
       margin-top: .8rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .card {
       aspect-ratio: 1/1;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.2);
-      display: grid;
-      place-items: center;
-      font-size: 1.4rem;
-      background: rgba(255,255,255,.08);
       cursor: pointer;
       user-select: none;
-      transition: transform .15s ease, background .15s ease;
+      perspective: 600px;
+      min-height: 90px;
     }
 
-    .card:hover { transform: translateY(-1px); }
-    .card.flipped, .card.matched { background: rgba(123, 232, 255, .18); }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.45s ease;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner,
+    .card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .card-back {
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .2);
+      font-size: 1.6rem;
+      color: rgba(200, 220, 255, 0.6);
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+      overflow: hidden;
+      border: 2px solid rgba(123, 232, 255, .35);
+      box-shadow: 0 0 12px rgba(100, 200, 255, 0.15);
+    }
+
+    .card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card.matched .card-front {
+      border-color: rgba(100, 255, 180, 0.5);
+      box-shadow: 0 0 16px rgba(100, 255, 180, 0.2);
+    }
+
+    .card:hover .card-inner {
+      transform: scale(1.03);
+    }
+
+    .card.flipped:hover .card-inner,
+    .card.matched:hover .card-inner {
+      transform: rotateY(180deg) scale(1.03);
+    }
 
     #meteor-game {
       position: relative;
       width: 100%;
-      height: 300px;
+      height: 220px;
       border-radius: 14px;
       border: 1px dashed rgba(155, 225, 255, 0.35);
-      background: linear-gradient(180deg, rgba(10,20,44,.65), rgba(5,11,28,.5));
+      background: linear-gradient(180deg, rgba(10, 20, 44, .65), rgba(5, 11, 28, .5));
       overflow: hidden;
       touch-action: none;
     }
@@ -262,11 +469,18 @@
 
     .meteor {
       position: absolute;
-      width: 26px;
-      height: 26px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffe7b8, #f79362 55%, #83444e 100%);
-      box-shadow: 0 0 14px rgba(255, 162, 105, 0.38);
+      overflow: hidden;
+      box-shadow: 0 0 14px rgba(255, 162, 105, 0.38), 0 0 6px rgba(255, 200, 150, 0.3);
+    }
+
+    .meteor img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
 
     .planet-wrap {
@@ -277,9 +491,9 @@
     }
 
     .choice-chip {
-      border: 1px solid rgba(255,255,255,.25);
+      border: 1px solid rgba(255, 255, 255, .25);
       border-radius: 12px;
-      background: rgba(255,255,255,.06);
+      background: rgba(255, 255, 255, .06);
       padding: .5rem;
     }
 
@@ -288,7 +502,7 @@
       margin-top: .35rem;
       padding: .5rem;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.2);
+      border: 1px solid rgba(255, 255, 255, .2);
       background: rgba(7, 12, 30, .72);
       color: var(--text);
     }
@@ -301,23 +515,138 @@
       background: rgba(9, 21, 56, .35);
       margin-top: .8rem;
     }
+
+    /* Planet builder */
+    .planet-scene {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      align-items: flex-start;
+      margin-top: .8rem;
+    }
+
+    .planet-visual {
+      flex: 1 1 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .planet-sphere {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      position: relative;
+      animation: planetSpin 12s linear infinite;
+      box-shadow:
+        inset -30px -10px 40px rgba(0, 0, 0, 0.4),
+        inset 10px 10px 25px rgba(255, 255, 255, 0.08),
+        0 0 40px rgba(123, 200, 255, 0.25),
+        0 0 80px rgba(123, 200, 255, 0.1);
+      transition: background 0.6s ease, box-shadow 0.6s ease;
+      background: radial-gradient(circle at 35% 35%, #5b8fff, #1a3a8a 60%, #0a1535);
+    }
+
+    .planet-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 190px;
+      height: 40px;
+      border: 2px solid rgba(200, 220, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) rotateX(72deg);
+      pointer-events: none;
+      transition: border-color 0.5s, width 0.5s;
+    }
+
+    @keyframes planetSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .planet-label {
+      text-align: center;
+      font-size: .85rem;
+      color: var(--accent-2);
+      min-height: 2.4em;
+    }
+
+    .planet-options {
+      flex: 1 1 240px;
+    }
+
+    .planet-options .choice-chip {
+      margin-bottom: .6rem;
+    }
+
+    .planet-options .choice-chip label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: .25rem;
+      font-size: .9rem;
+    }
+
+    .planet-card {
+      margin-top: .8rem;
+      padding: .8rem;
+      border-radius: 12px;
+      border: 1px solid rgba(123, 232, 255, .2);
+      background: rgba(10, 20, 50, .4);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .planet-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .planet-card h3 {
+      margin: 0 0 .4rem;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .planet-card p {
+      margin: .2rem 0;
+      font-size: .9rem;
+    }
   </style>
 </head>
+
 <body>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
   <div class="sky-layer"></div>
+  <canvas id="nebula-canvas"></canvas>
   <canvas id="stars"></canvas>
   <div class="horizon"></div>
 
+  <div id="star-container"></div>
   <main class="app">
     <section class="panel active" id="scene-intro">
       <h1>Hi shriniket 🌌</h1>
       <p class="lead">I made this little cosmic journey for you. Choose which games you want to keep, then start.</p>
       <h3>Pick your game lineup (you can remove any later)</h3>
       <div class="selector-grid" id="gameSelector">
-        <label class="game-option"><input type="checkbox" data-game="stars" checked /> ⭐ Catch stars <span class="tiny">(easy)</span></label>
-        <label class="game-option"><input type="checkbox" data-game="memory" checked /> 🃏 Memory match <span class="tiny">(classic)</span></label>
-        <label class="game-option"><input type="checkbox" data-game="meteor" checked /> ☄️ Meteor dodge <span class="tiny">(new)</span></label>
-        <label class="game-option"><input type="checkbox" data-game="planet" checked /> 🪐 Build-a-date planet <span class="tiny">(new)</span></label>
+        <label class="game-option"><input type="checkbox" data-game="stars" checked /> ⭐ Catch stars <span
+            class="tiny">(easy)</span></label>
+        <label class="game-option"><input type="checkbox" data-game="memory" checked /> 🃏 Memory match <span
+            class="tiny">(classic)</span></label>
+        <label class="game-option"><input type="checkbox" data-game="meteor" checked /> ☄️ Meteor dodge <span
+            class="tiny">(new)</span></label>
+        <label class="game-option"><input type="checkbox" data-game="planet" checked /> 🪐 Build-a-date planet <span
+            class="tiny">(new)</span></label>
       </div>
       <div class="btn-row">
         <button id="startJourney">Start the journey ✨</button>
@@ -326,12 +655,13 @@
     </section>
 
     <section class="panel" id="scene-stars">
-      <h2>Game 1: Catch the Shooting Stars</h2>
+      <h2>Game 1: Catch the Shooting Stars ⭐</h2>
       <p>Tap/click <strong>12 stars</strong> to gather enough stardust.</p>
       <div class="hud" id="starScore">Stars collected: 0 / 12</div>
       <div id="star-game"></div>
       <div class="btn-row">
         <button id="toConstellation" class="subtle" disabled>Continue</button>
+        <button id="skipStars" class="subtle">Skip (test)</button>
       </div>
     </section>
 
@@ -342,21 +672,23 @@
       <canvas id="constellation" width="700" height="380"></canvas>
       <div class="btn-row">
         <button id="toMemory" class="subtle" disabled>Continue</button>
+        <button id="skipConstellation" class="subtle">Skip (test)</button>
       </div>
     </section>
 
     <section class="panel" id="scene-memory">
-      <h2>Game 3: Memory Match</h2>
+      <h2>Game 2: Memory Match 🃏</h2>
       <p>Match all pairs to unlock the next scene.</p>
       <div class="hud" id="memoryScore">Pairs found: 0 / 4</div>
       <div class="memory-grid" id="memoryGrid"></div>
       <div class="btn-row">
         <button id="toMeteor" class="subtle" disabled>Continue</button>
+        <button id="skipMemory" class="subtle">Skip (test)</button>
       </div>
     </section>
 
     <section class="panel" id="scene-meteor">
-      <h2>Game 4: Meteor Dodge</h2>
+      <h2>Game 3: Meteor Dodge ☄️</h2>
       <p>Move the ship and survive for <strong>18 seconds</strong>.</p>
       <div class="hud" id="meteorHud">Survival: 0.0s / 18.0s</div>
       <div id="meteor-game">
@@ -364,33 +696,67 @@
       </div>
       <div class="btn-row">
         <button id="toPlanet" class="subtle" disabled>Continue</button>
+        <button id="skipMeteor" class="subtle">Skip (test)</button>
       </div>
       <p id="meteorStatus" class="status"></p>
     </section>
 
     <section class="panel" id="scene-planet">
-      <h2>Game 5: Build Our Date Planet</h2>
-      <p>Pick your vibe. This is optional and customizable.</p>
-      <div class="planet-wrap">
-        <label class="choice-chip">Food
-          <select id="foodChoice">
-            <option>Pizza 🍕</option><option>Cafe ☕</option><option>Street food 🌮</option><option>Dessert 🍰</option>
-          </select>
-        </label>
-        <label class="choice-chip">Vibe
-          <select id="vibeChoice">
-            <option>Cozy walk 🌙</option><option>Music + chat 🎧</option><option>Movie night 🎬</option><option>Sunset point 🌅</option>
-          </select>
-        </label>
-        <label class="choice-chip">Spot
-          <select id="spotChoice">
-            <option>Rooftop ✨</option><option>Park 🌳</option><option>Cafe corner 🕯️</option><option>Lakeside 💧</option>
-          </select>
-        </label>
+      <h2>Game 4: Build Our Date Planet 🪐</h2>
+      <p>Every choice shapes your planet. Pick what feels right — watch it transform!</p>
+      <div class="planet-scene">
+        <div class="planet-visual">
+          <div class="planet-sphere" id="planetSphere">
+            <div class="planet-ring" id="planetRing"></div>
+          </div>
+          <div class="planet-label" id="planetLabel">Your planet awaits...</div>
+        </div>
+        <div class="planet-options">
+          <div class="choice-chip">
+            <label>🍽️ What should we eat?</label>
+            <select id="foodChoice">
+              <option value="">Choose...</option>
+              <option>Pizza 🍕</option>
+              <option>Cafe ☕</option>
+              <option>Street food 🌮</option>
+              <option>Dessert 🍰</option>
+              <option>Sushi 🍣</option>
+              <option>Home cooked 🍳</option>
+            </select>
+          </div>
+          <div class="choice-chip">
+            <label>🎵 What's the vibe?</label>
+            <select id="vibeChoice">
+              <option value="">Choose...</option>
+              <option>Cozy walk 🌙</option>
+              <option>Music + chat 🎧</option>
+              <option>Movie night 🎬</option>
+              <option>Sunset point 🌅</option>
+              <option>Stargazing 🌠</option>
+              <option>Adventure 🎢</option>
+            </select>
+          </div>
+          <div class="choice-chip">
+            <label>📍 Where should we go?</label>
+            <select id="spotChoice">
+              <option value="">Choose...</option>
+              <option>Rooftop ✨</option>
+              <option>Park 🌳</option>
+              <option>Cafe corner 🕯️</option>
+              <option>Lakeside 💧</option>
+              <option>Beach 🏖️</option>
+              <option>Hilltop ⛰️</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="planet-card" id="planetCard">
+        <h3>🪐 Your Date Planet</h3>
+        <p id="planetSummary"></p>
       </div>
       <div class="btn-row">
-        <button id="savePlanet" class="subtle">Lock this planet</button>
-        <button id="toFinal" class="subtle" disabled>Reveal final message</button>
+        <button id="savePlanet" class="subtle">Lock this planet 🔒</button>
+        <button id="toFinal" class="subtle" disabled>Reveal final message 💌</button>
       </div>
       <p id="planetStatus" class="status"></p>
     </section>
@@ -424,7 +790,7 @@
     };
 
     const state = {
-      name: 'shriniket',
+      name: 'Batman',
       stars: 0,
       constellationIndex: 0,
       matches: 0,
@@ -437,9 +803,20 @@
 
     const orderedGames = ['stars', 'memory', 'meteor', 'planet'];
 
+    function updateProgress() {
+      const total = state.sceneOrder.length;
+      if (!total) return;
+      const current = state.sceneOrder.indexOf(currentScene);
+      const pct = Math.min(100, ((current) / (total - 1)) * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+    }
+    let currentScene = 'intro';
+
     function showScene(key) {
       Object.values(scenes).forEach(s => s.classList.remove('active'));
       scenes[key].classList.add('active');
+      currentScene = key;
+      updateProgress();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -483,13 +860,23 @@
         state.stars += 1;
         starScore.textContent = `Stars collected: ${state.stars} / 12`;
         s.remove();
-        if (state.stars >= 12) toConstellation.disabled = false;
+        if (state.stars >= 12) {
+          toConstellation.disabled = false;
+          celebrateGameComplete();
+        }
       }, { once: true });
       starField.appendChild(s);
       setTimeout(() => s.remove(), 1800);
     }
     setInterval(spawnClickStar, 420);
     toConstellation.addEventListener('click', () => {
+      const next = nextSceneFrom('stars');
+      showScene(next);
+      if (next === 'meteor') startMeteorGame();
+    });
+
+    // Skip button for testing
+    document.getElementById('skipStars').addEventListener('click', () => {
       const next = nextSceneFrom('stars');
       showScene(next);
       if (next === 'meteor') startMeteorGame();
@@ -581,6 +968,7 @@
         constellationHint.textContent = 'Heart constellation complete!';
         toMemory.disabled = false;
         drag.active = false;
+        celebrateGameComplete();
       }
     }
 
@@ -620,24 +1008,54 @@
       showScene(next);
       if (next === 'meteor') startMeteorGame();
     });
+    document.getElementById('skipConstellation').addEventListener('click', () => {
+      const next = nextSceneFrom('constellation');
+      showScene(next);
+      if (next === 'meteor') startMeteorGame();
+    });
     fitConstellationCanvas();
 
-    // Game 3: memory
+    // Game 3: memory (photo cards)
     const memoryGrid = document.getElementById('memoryGrid');
     const memoryScore = document.getElementById('memoryScore');
     const toMeteor = document.getElementById('toMeteor');
-    const baseCards = ['☕', '🎧', '🍕', '🌧️'];
-    const cards = [...baseCards, ...baseCards].map(v => ({ v, id: Math.random() })).sort((a, b) => a.id - b.id);
+    const photoCards = [
+      'IMG_0702.jpg',
+      '880c4c54-f993-4c67-a595-e8084eb41da3.jpeg',
+      'IMG20260103233432.jpeg',
+      'IMG20260105140611.jpeg'
+    ];
+    const cards = [...photoCards, ...photoCards]
+      .map(v => ({ v, id: Math.random() }))
+      .sort((a, b) => a.id - b.id);
     let firstCard = null;
     cards.forEach((item) => {
-      const card = document.createElement('button');
+      const card = document.createElement('div');
       card.className = 'card';
-      card.textContent = '✧';
       card.dataset.value = item.v;
+
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+
+      const back = document.createElement('div');
+      back.className = 'card-back';
+      back.textContent = '✧';
+
+      const front = document.createElement('div');
+      front.className = 'card-front';
+      const img = document.createElement('img');
+      img.src = item.v;
+      img.alt = 'memory card';
+      img.draggable = false;
+      front.appendChild(img);
+
+      inner.appendChild(back);
+      inner.appendChild(front);
+      card.appendChild(inner);
+
       card.addEventListener('click', () => {
-        if (state.locked || card.classList.contains('matched') || card === firstCard) return;
+        if (state.locked || card.classList.contains('matched') || card.classList.contains('flipped')) return;
         card.classList.add('flipped');
-        card.textContent = item.v;
         if (!firstCard) { firstCard = card; return; }
         if (firstCard.dataset.value === card.dataset.value) {
           firstCard.classList.add('matched');
@@ -645,7 +1063,10 @@
           firstCard = null;
           state.matches += 1;
           memoryScore.textContent = `Pairs found: ${state.matches} / 4`;
-          if (state.matches === 4) toMeteor.disabled = false;
+          if (state.matches === 4) {
+            toMeteor.disabled = false;
+            celebrateGameComplete();
+          }
           return;
         }
         state.locked = true;
@@ -653,15 +1074,20 @@
         setTimeout(() => {
           card.classList.remove('flipped');
           prev.classList.remove('flipped');
-          card.textContent = '✧';
-          prev.textContent = '✧';
           firstCard = null;
           state.locked = false;
-        }, 650);
+        }, 800);
       });
       memoryGrid.appendChild(card);
     });
     toMeteor.addEventListener('click', () => {
+      const next = nextSceneFrom('memory');
+      showScene(next);
+      if (next === 'meteor') startMeteorGame();
+    });
+
+    // Skip button for testing
+    document.getElementById('skipMemory').addEventListener('click', () => {
       const next = nextSceneFrom('memory');
       showScene(next);
       if (next === 'meteor') startMeteorGame();
@@ -693,11 +1119,16 @@
       if (!state.meteor.active) return;
       const m = document.createElement('div');
       m.className = 'meteor';
-      const x = Math.random() * (meteorGame.clientWidth - 26);
+      const img = document.createElement('img');
+      img.src = '880c4c54-f993-4c67-a595-e8084eb41da3.jpeg';
+      img.alt = '';
+      img.draggable = false;
+      m.appendChild(img);
+      const x = Math.random() * (meteorGame.clientWidth - 30);
       m.style.left = `${x}px`;
-      m.style.top = '-28px';
+      m.style.top = '-32px';
       meteorGame.appendChild(m);
-      meteorItems.push({ el: m, x, y: -28, vy: 2.2 + Math.random() * 1.4 });
+      meteorItems.push({ el: m, x, y: -32, vy: 2.2 + Math.random() * 1.4 });
     }
 
     function checkShipCollision(m) {
@@ -706,15 +1137,20 @@
       return !(meteorRect.right < shipRect.left || meteorRect.left > shipRect.right || meteorRect.bottom < shipRect.top || meteorRect.top > shipRect.bottom);
     }
 
-    function meteorLoop() {
+    let meteorLastTime = 0;
+
+    function meteorLoop(timestamp) {
       if (!state.meteor.active) return;
-      const dt = 1 / 60;
+      if (!meteorLastTime) meteorLastTime = timestamp;
+      const dt = (timestamp - meteorLastTime) / 1000;
+      meteorLastTime = timestamp;
       state.meteor.timer += dt;
       meteorHud.textContent = `Survival: ${state.meteor.timer.toFixed(1)}s / 18.0s`;
 
+      const speed = dt * 60; // normalize to 60fps equivalent
       for (let i = meteorItems.length - 1; i >= 0; i--) {
         const m = meteorItems[i];
-        m.y += m.vy;
+        m.y += m.vy * speed;
         m.el.style.top = `${m.y}px`;
         if (checkShipCollision(m)) {
           state.meteor.active = false;
@@ -738,6 +1174,7 @@
         meteorStatus.textContent = 'Perfect dodge!';
         toPlanet.disabled = false;
         clearInterval(meteorInterval);
+        celebrateGameComplete();
         return;
       }
 
@@ -747,6 +1184,7 @@
     function startMeteorGame() {
       resetMeteor();
       state.meteor.active = true;
+      meteorLastTime = 0;
       clearInterval(meteorInterval);
       meteorInterval = setInterval(spawnMeteor, 370);
       cancelAnimationFrame(meteorAnim);
@@ -774,18 +1212,110 @@
       clearInterval(meteorInterval);
     });
 
-    // Game 5: build-a-date planet (new)
+    // Skip button for testing
+    document.getElementById('skipMeteor').addEventListener('click', () => {
+      const next = nextSceneFrom('meteor');
+      showScene(next);
+      cancelAnimationFrame(meteorAnim);
+      clearInterval(meteorInterval);
+    });
+
+    // Game 4: build-a-date planet (interactive)
     const savePlanet = document.getElementById('savePlanet');
     const toFinal = document.getElementById('toFinal');
     const planetStatus = document.getElementById('planetStatus');
+    const planetSphere = document.getElementById('planetSphere');
+    const planetRing = document.getElementById('planetRing');
+    const planetLabel = document.getElementById('planetLabel');
+    const planetCard = document.getElementById('planetCard');
+    const planetSummary = document.getElementById('planetSummary');
+
+    const planetColors = {
+      'Pizza 🍕': ['#ff6a3d', '#ff9a5c', '#8b2500'],
+      'Cafe ☕': ['#c89b7b', '#8b6f4e', '#3d2b1f'],
+      'Street food 🌮': ['#ffd54f', '#ff8f00', '#5d4037'],
+      'Dessert 🍰': ['#f8bbd0', '#f48fb1', '#880e4f'],
+      'Sushi 🍣': ['#80cbc4', '#26a69a', '#004d40'],
+      'Home cooked 🍳': ['#a5d6a7', '#66bb6a', '#1b5e20']
+    };
+    const ringColors = {
+      'Cozy walk 🌙': 'rgba(255, 236, 179, 0.5)',
+      'Music + chat 🎧': 'rgba(186, 147, 255, 0.5)',
+      'Movie night 🎬': 'rgba(255, 138, 128, 0.5)',
+      'Sunset point 🌅': 'rgba(255, 183, 77, 0.5)',
+      'Stargazing 🌠': 'rgba(130, 200, 255, 0.5)',
+      'Adventure 🎢': 'rgba(105, 255, 155, 0.5)'
+    };
+    const spotGlows = {
+      'Rooftop ✨': 'rgba(255, 215, 0, 0.3)',
+      'Park 🌳': 'rgba(76, 175, 80, 0.3)',
+      'Cafe corner 🕯️': 'rgba(255, 183, 77, 0.3)',
+      'Lakeside 💧': 'rgba(100, 181, 246, 0.3)',
+      'Beach 🏖️': 'rgba(255, 224, 130, 0.3)',
+      'Hilltop ⛰️': 'rgba(149, 117, 205, 0.3)'
+    };
+
+    function updatePlanetVisual() {
+      const food = document.getElementById('foodChoice').value;
+      const vibe = document.getElementById('vibeChoice').value;
+      const spot = document.getElementById('spotChoice').value;
+
+      // Update planet colors based on food
+      if (food && planetColors[food]) {
+        const c = planetColors[food];
+        planetSphere.style.background = `radial-gradient(circle at 35% 35%, ${c[0]}, ${c[1]} 60%, ${c[2]})`;
+      }
+
+      // Update ring color based on vibe
+      if (vibe && ringColors[vibe]) {
+        planetRing.style.borderColor = ringColors[vibe];
+        planetRing.style.width = '200px';
+      }
+
+      // Update glow based on spot
+      if (spot && spotGlows[spot]) {
+        planetSphere.style.boxShadow = `
+          inset -30px -10px 40px rgba(0,0,0,0.4),
+          inset 10px 10px 25px rgba(255,255,255,0.08),
+          0 0 50px ${spotGlows[spot]},
+          0 0 100px ${spotGlows[spot]}`;
+      }
+
+      // Build label
+      const parts = [food, vibe, spot].filter(v => v);
+      if (parts.length > 0) {
+        planetLabel.textContent = parts.join(' · ');
+      } else {
+        planetLabel.textContent = 'Your planet awaits...';
+      }
+
+      // Show card preview if all selected
+      if (food && vibe && spot) {
+        planetSummary.textContent = `${food} + ${vibe} at ${spot}`;
+        planetCard.classList.add('visible');
+      } else {
+        planetCard.classList.remove('visible');
+      }
+    }
+
+    document.getElementById('foodChoice').addEventListener('change', updatePlanetVisual);
+    document.getElementById('vibeChoice').addEventListener('change', updatePlanetVisual);
+    document.getElementById('spotChoice').addEventListener('change', updatePlanetVisual);
+
     savePlanet.addEventListener('click', () => {
       const food = document.getElementById('foodChoice').value;
       const vibe = document.getElementById('vibeChoice').value;
       const spot = document.getElementById('spotChoice').value;
+      if (!food || !vibe || !spot) {
+        planetStatus.className = 'status warn';
+        planetStatus.textContent = 'Pick all three to build your planet!';
+        return;
+      }
       state.datePlan = `${food} + ${vibe} at ${spot}`;
       planetStatus.className = 'status ok';
-      planetStatus.textContent = `Planet saved: ${state.datePlan}`;
+      planetStatus.textContent = '🪐 Planet locked! Your date world is ready.';
       toFinal.disabled = false;
+      celebrateGameComplete();
     });
 
     toFinal.addEventListener('click', () => {
@@ -797,10 +1327,34 @@
       }
     });
 
+    function typeWriter(el, text, speed, cb) {
+      el.textContent = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'typewriter-cursor';
+      el.appendChild(cursor);
+      let i = 0;
+      function tick() {
+        if (i < text.length) {
+          el.insertBefore(document.createTextNode(text[i]), cursor);
+          i++;
+          setTimeout(tick, speed);
+        } else {
+          setTimeout(() => cursor.remove(), 1200);
+          if (cb) cb();
+        }
+      }
+      tick();
+    }
+
     function showFinal() {
-      document.getElementById('finalMessage').textContent = `Hey ${state.name}, I made this little cosmic game because you genuinely brighten my days. Would you like to go on a date with me this weekend? No pressure at all — I just wanted to ask you honestly.`;
+      // Stop shooting stars and star streaks once the journey is complete
+      shootingStarsActive = false;
+      clearInterval(shootingStarInterval);
+      clearInterval(starStreakInterval);
+      const msg = `Hey ${state.name}, I made this little cosmic game because you genuinely brighten my days. Would you like to go on a real date with me?`;
       document.getElementById('datePlan').textContent = state.datePlan ? `Date planet idea: ${state.datePlan}` : '';
       showScene('final');
+      typeWriter(document.getElementById('finalMessage'), msg, 32);
     }
 
     // direct continuation if last selected game is not planet
@@ -816,7 +1370,7 @@
       const response = document.getElementById('response');
       response.className = 'status ok';
       response.textContent = 'Yay! Cosmic success unlocked. Pick a time and send the plan ✨';
-      burstStars();
+      celebrateGameComplete();
     });
     document.getElementById('maybeBtn').addEventListener('click', () => {
       const response = document.getElementById('response');
@@ -825,126 +1379,490 @@
     });
     document.getElementById('restart').addEventListener('click', () => window.location.reload());
 
-    // Ambient animated sky
+    // ═══════════════════════════════════════════════════
+    // ANIMATED COSMIC BACKGROUND (moving nebula + stars)
+    // ═══════════════════════════════════════════════════
+
+    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, sx: 0, sy: 0 };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('touchmove', (e) => {
+      mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
+    }, { passive: true });
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    // --- Nebula: pre-render to offscreen canvas (done ONCE, composited each frame) ---
+    const nebCanvas = document.getElementById('nebula-canvas');
+    const nctx = nebCanvas.getContext('2d');
+    let nebulaLayers = []; // offscreen canvases for each nebula blob group
+
+    function buildNebula() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      nebCanvas.width = Math.floor(w * devicePixelRatio);
+      nebCanvas.height = Math.floor(h * devicePixelRatio);
+      nctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+      // Create 3 offscreen nebula layers with different colors/positions
+      const layerDefs = [
+        {
+          blobs: [
+            { x: 0.2, y: 0.25, r: 0.25, h: 220, s: 75, l: 45, a: 0.13 },
+            { x: 0.65, y: 0.15, r: 0.20, h: 240, s: 60, l: 40, a: 0.10 },
+            { x: 0.4, y: 0.6, r: 0.22, h: 210, s: 70, l: 50, a: 0.08 },
+          ]
+        },
+        {
+          blobs: [
+            { x: 0.75, y: 0.4, r: 0.28, h: 270, s: 55, l: 42, a: 0.10 },
+            { x: 0.15, y: 0.55, r: 0.18, h: 200, s: 80, l: 48, a: 0.09 },
+            { x: 0.5, y: 0.3, r: 0.30, h: 230, s: 65, l: 46, a: 0.11 },
+          ]
+        },
+        {
+          blobs: [
+            { x: 0.35, y: 0.7, r: 0.20, h: 280, s: 50, l: 38, a: 0.07 },
+            { x: 0.8, y: 0.65, r: 0.22, h: 250, s: 60, l: 44, a: 0.08 },
+            { x: 0.1, y: 0.1, r: 0.24, h: 195, s: 75, l: 50, a: 0.10 },
+          ]
+        }
+      ];
+
+      nebulaLayers = layerDefs.map((layer, li) => {
+        const oc = document.createElement('canvas');
+        oc.width = Math.floor(w * 1.3);
+        oc.height = Math.floor(h * 1.3);
+        const octx = oc.getContext('2d');
+        const scale = 1.3;
+
+        for (const b of layer.blobs) {
+          const cx = b.x * w * scale;
+          const cy = b.y * h * scale;
+          const cr = b.r * Math.max(w, h) * scale;
+          const g = octx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+          g.addColorStop(0, `hsla(${b.h}, ${b.s}%, ${b.l}%, ${b.a})`);
+          g.addColorStop(0.4, `hsla(${b.h + 15}, ${b.s - 10}%, ${b.l}%, ${b.a * 0.6})`);
+          g.addColorStop(0.7, `hsla(${b.h + 25}, ${b.s - 20}%, ${b.l - 5}%, ${b.a * 0.25})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          octx.fillStyle = g;
+          octx.beginPath();
+          octx.arc(cx, cy, cr, 0, Math.PI * 2);
+          octx.fill();
+        }
+        return {
+          canvas: oc,
+          speed: 0.00004 + li * 0.000015,
+          phaseX: li * 2.1, phaseY: li * 1.7,
+          parallax: 0.008 + li * 0.006
+        };
+      });
+    }
+
+    function drawNebula(time) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      nctx.clearRect(0, 0, w, h);
+      const mx = (mouse.sx - w / 2);
+      const my = (mouse.sy - h / 2);
+
+      for (const layer of nebulaLayers) {
+        const driftX = Math.sin(time * layer.speed + layer.phaseX) * w * 0.06;
+        const driftY = Math.cos(time * layer.speed * 0.8 + layer.phaseY) * h * 0.04;
+        const px = -w * 0.15 + driftX + mx * layer.parallax;
+        const py = -h * 0.15 + driftY + my * layer.parallax;
+        nctx.drawImage(layer.canvas, px, py, w * 1.3, h * 1.3);
+      }
+    }
+
+    // --- Stars canvas (dense moving stars + interactive) ---
     const starCanvas = document.getElementById('stars');
     const sctx = starCanvas.getContext('2d');
     let skyStars = [];
-    let dust = [];
     let shootingStars = [];
-    let skyTime = 0;
+    let mouseTrail = [];
 
-    function rand(min, max) { return Math.random() * (max - min) + min; }
     function resizeSky() {
-      starCanvas.width = Math.floor(window.innerWidth * window.devicePixelRatio);
-      starCanvas.height = Math.floor(window.innerHeight * window.devicePixelRatio);
-      sctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      starCanvas.width = Math.floor(window.innerWidth * devicePixelRatio);
+      starCanvas.height = Math.floor(window.innerHeight * devicePixelRatio);
+      sctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       const w = window.innerWidth;
       const h = window.innerHeight;
-      skyStars = Array.from({ length: Math.floor((w * h) / 5200) }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h * 0.78,
-        r: rand(0.35, 1.9),
-        a: rand(0.2, 0.9),
-        d: rand(0.002, 0.012),
-        hue: rand(195, 230)
-      }));
-      dust = Array.from({ length: Math.floor((w * h) / 11000) }, () => ({
-        x: Math.random() * w,
-        y: rand(h * 0.06, h * 0.7),
-        r: rand(18, 70),
-        a: rand(0.03, 0.11),
-        shift: rand(0.2, 1.2)
-      }));
+
+      skyStars = [];
+      // Dense far stars (tiny, lots)
+      const farCount = Math.floor((w * h) / 2200);
+      for (let i = 0; i < farCount; i++) {
+        skyStars.push({
+          x: Math.random() * w, y: Math.random() * h,
+          r: rand(0.3, 1.0), a: rand(0.15, 0.55),
+          d: rand(0.001, 0.004), hue: rand(200, 240),
+          vx: rand(-0.02, 0.02), vy: rand(-0.01, 0.01),
+          layer: 0
+        });
+      }
+      // Mid stars
+      const midCount = Math.floor((w * h) / 9000);
+      for (let i = 0; i < midCount; i++) {
+        skyStars.push({
+          x: Math.random() * w, y: Math.random() * h * 0.9,
+          r: rand(0.8, 1.7), a: rand(0.25, 0.75),
+          d: rand(0.003, 0.01), hue: rand(195, 250),
+          vx: rand(-0.04, 0.04), vy: rand(-0.02, 0.02),
+          layer: 1
+        });
+      }
+      // Bright near stars (few, large)
+      const nearCount = Math.floor((w * h) / 45000);
+      for (let i = 0; i < nearCount; i++) {
+        skyStars.push({
+          x: Math.random() * w, y: Math.random() * h * 0.85,
+          r: rand(1.5, 2.8), a: rand(0.4, 0.95),
+          d: rand(0.005, 0.016), hue: rand(190, 260),
+          vx: rand(-0.06, 0.06), vy: rand(-0.03, 0.03),
+          layer: 2
+        });
+      }
+
       shootingStars = [];
+      mouseTrail = [];
+      buildNebula();
       fitConstellationCanvas();
     }
+
     function spawnShootingStar(w, h) {
+      const isBright = Math.random() < 0.3;
+      const dir = Math.random() < 0.5 ? -1 : 1;
       shootingStars.push({
-        x: rand(w * 0.2, w * 0.95), y: rand(20, h * 0.45),
-        vx: rand(-7.5, -4.8), vy: rand(2.1, 3.7), life: rand(28, 44), t: 0
+        x: dir > 0 ? rand(-20, w * 0.3) : rand(w * 0.7, w + 20),
+        y: rand(10, h * 0.55),
+        vx: dir * rand(2.5, 5.5),
+        vy: rand(0.8, 2.2),
+        life: isBright ? rand(160, 200) : rand(140, 180),
+        t: 0,
+        trail: [],
+        bright: isBright,
+        hue: rand(190, 280)
       });
     }
-    function drawMilkyBand(w, h) {
-      sctx.save();
-      sctx.translate(w * 0.5, h * 0.24);
-      sctx.rotate(-0.19 + Math.sin(skyTime * 0.00008) * 0.02);
-      const grad = sctx.createRadialGradient(-w * 0.1, -h * 0.02, 30, 0, 0, w * 0.62);
-      grad.addColorStop(0, 'rgba(220, 228, 255, 0.2)');
-      grad.addColorStop(0.28, 'rgba(160, 185, 245, 0.18)');
-      grad.addColorStop(0.68, 'rgba(128, 164, 240, 0.08)');
-      grad.addColorStop(1, 'rgba(80, 108, 185, 0.01)');
-      sctx.fillStyle = grad;
-      sctx.beginPath();
-      sctx.ellipse(0, 0, w * 0.62, h * 0.19, 0, 0, Math.PI * 2);
-      sctx.fill();
-      sctx.restore();
-    }
-    function animateSky() {
+
+    function animateSky(timestamp) {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      skyTime += 16;
+      const time = timestamp || 0;
+
+      // Smooth mouse
+      mouse.sx = lerp(mouse.sx, mouse.x, 0.05);
+      mouse.sy = lerp(mouse.sy, mouse.y, 0.05);
+
+      // Draw nebula (composites pre-rendered layers)
+      drawNebula(time);
+
+      // Stars
       sctx.clearRect(0, 0, w, h);
-      drawMilkyBand(w, h);
-      for (const cloud of dust) {
-        const wobbleX = Math.sin((skyTime * 0.00014) * cloud.shift + cloud.y * 0.03) * 8;
-        const wobbleY = Math.cos((skyTime * 0.00013) * cloud.shift + cloud.x * 0.01) * 4;
-        const g = sctx.createRadialGradient(cloud.x + wobbleX, cloud.y + wobbleY, 0, cloud.x + wobbleX, cloud.y + wobbleY, cloud.r);
-        g.addColorStop(0, `rgba(180, 200, 255, ${cloud.a})`);
-        g.addColorStop(1, 'rgba(130, 160, 240, 0)');
-        sctx.fillStyle = g;
-        sctx.beginPath();
-        sctx.arc(cloud.x + wobbleX, cloud.y + wobbleY, cloud.r, 0, Math.PI * 2);
-        sctx.fill();
-      }
       for (const st of skyStars) {
         st.a += st.d;
-        if (st.a <= 0.18 || st.a >= 0.96) st.d *= -1;
+        if (st.a <= 0.08 || st.a >= 0.95) st.d *= -1;
+        // Slow drift
+        st.x += st.vx;
+        st.y += st.vy;
+        if (st.x < -5) st.x = w + 5;
+        if (st.x > w + 5) st.x = -5;
+        if (st.y < -5) st.y = h + 5;
+        if (st.y > h + 5) st.y = -5;
+
         sctx.beginPath();
         sctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
-        sctx.fillStyle = `hsla(${st.hue}, 85%, 88%, ${st.a})`;
+        sctx.fillStyle = `hsla(${st.hue}, 80%, 88%, ${st.a})`;
+        sctx.fill();
+
+        // Bright stars get sparkle
+        if (st.layer === 2 && st.a > 0.65) {
+          const sp = (st.a - 0.65) * 2.5;
+          sctx.strokeStyle = `hsla(${st.hue}, 60%, 90%, ${sp * 0.6})`;
+          sctx.lineWidth = 0.5;
+          const len = st.r * 2.5;
+          sctx.beginPath();
+          sctx.moveTo(st.x - len, st.y); sctx.lineTo(st.x + len, st.y);
+          sctx.moveTo(st.x, st.y - len); sctx.lineTo(st.x, st.y + len);
+          sctx.stroke();
+        }
+      }
+
+      // Mouse glow
+      const glowR = 130 + Math.sin(time * 0.0015) * 25;
+      const glow = sctx.createRadialGradient(mouse.sx, mouse.sy, 0, mouse.sx, mouse.sy, glowR);
+      const hue1 = (time * 0.01) % 360;
+      glow.addColorStop(0, `hsla(${hue1}, 65%, 60%, 0.10)`);
+      glow.addColorStop(0.5, `hsla(${hue1 + 30}, 55%, 50%, 0.03)`);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      sctx.fillStyle = glow;
+      sctx.beginPath();
+      sctx.arc(mouse.sx, mouse.sy, glowR, 0, Math.PI * 2);
+      sctx.fill();
+
+      // Mouse trail
+      if (Math.random() < 0.5) {
+        mouseTrail.push({
+          x: mouse.x + rand(-5, 5), y: mouse.y + rand(-5, 5),
+          r: rand(1, 2.8), a: rand(0.3, 0.65),
+          hue: (time * 0.025 + rand(-15, 15)) % 360,
+          life: rand(18, 38), t: 0
+        });
+      }
+      if (mouseTrail.length > 50) mouseTrail.splice(0, mouseTrail.length - 50);
+      mouseTrail = mouseTrail.filter(p => p.t < p.life);
+      for (const p of mouseTrail) {
+        p.t++;
+        p.y -= 0.35;
+        const fade = 1 - p.t / p.life;
+        sctx.beginPath();
+        sctx.arc(p.x, p.y, p.r * fade, 0, Math.PI * 2);
+        sctx.fillStyle = `hsla(${p.hue}, 75%, 78%, ${p.a * fade})`;
         sctx.fill();
       }
-      if (Math.random() < 0.015 && shootingStars.length < 2) spawnShootingStar(w, h);
-      shootingStars = shootingStars.filter((m) => m.t < m.life);
-      for (const meteor of shootingStars) {
-        meteor.t += 1;
-        meteor.x += meteor.vx;
-        meteor.y += meteor.vy;
-        const alpha = 1 - meteor.t / meteor.life;
-        sctx.strokeStyle = `rgba(194, 229, 255, ${alpha * 0.9})`;
-        sctx.lineWidth = 1.6;
+
+      // Shooting stars / comets (extra random spawns between intervals)
+      if (shootingStarsActive && Math.random() < 0.05 && shootingStars.length < 15) spawnShootingStar(w, h);
+      shootingStars = shootingStars.filter(m => m.t < m.life);
+      for (const m of shootingStars) {
+        m.t++;
+        m.x += m.vx;
+        m.y += m.vy;
+        m.trail.push({ x: m.x, y: m.y });
+        const maxTrail = m.bright ? 35 : 22;
+        if (m.trail.length > maxTrail) m.trail.shift();
+        const alpha = 1 - m.t / m.life;
+        const hue = m.hue || 210;
+
+        // Trail
+        for (let i = 1; i < m.trail.length; i++) {
+          const ta = (i / m.trail.length) * alpha;
+          const lw = m.bright ? 3.5 * (i / m.trail.length) : 2.2 * (i / m.trail.length);
+          sctx.strokeStyle = `hsla(${hue}, 60%, 82%, ${ta * 0.8})`;
+          sctx.lineWidth = lw;
+          sctx.beginPath();
+          sctx.moveTo(m.trail[i - 1].x, m.trail[i - 1].y);
+          sctx.lineTo(m.trail[i].x, m.trail[i].y);
+          sctx.stroke();
+        }
+
+        // Head glow
+        const headR = m.bright ? 4 : 2;
         sctx.beginPath();
-        sctx.moveTo(meteor.x, meteor.y);
-        sctx.lineTo(meteor.x - meteor.vx * 5, meteor.y - meteor.vy * 5);
-        sctx.stroke();
+        sctx.arc(m.x, m.y, headR, 0, Math.PI * 2);
+        sctx.fillStyle = `hsla(${hue}, 50%, 92%, ${alpha})`;
+        sctx.shadowBlur = m.bright ? 20 : 10;
+        sctx.shadowColor = `hsla(${hue}, 65%, 70%, ${alpha * 0.7})`;
+        sctx.fill();
+        sctx.shadowBlur = 0;
+
+        // Bright comets get an outer glow ring
+        if (m.bright && alpha > 0.3) {
+          const grd = sctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 18);
+          grd.addColorStop(0, `hsla(${hue}, 55%, 80%, ${alpha * 0.2})`);
+          grd.addColorStop(1, 'rgba(0,0,0,0)');
+          sctx.fillStyle = grd;
+          sctx.beginPath();
+          sctx.arc(m.x, m.y, 18, 0, Math.PI * 2);
+          sctx.fill();
+        }
       }
+
+
+
       requestAnimationFrame(animateSky);
     }
 
-    function burstStars() {
-      const burst = document.createElement('div');
-      burst.style.position = 'fixed';
-      burst.style.inset = '0';
-      burst.style.pointerEvents = 'none';
-      burst.innerHTML = Array.from({ length: 24 }, (_, i) =>
-        `<span style="position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;color:#ffe9a3;opacity:0;animation:pop .9s ease ${i*0.02}s forwards">✦</span>`
-      ).join('');
-      document.body.appendChild(burst);
-      setTimeout(() => burst.remove(), 1300);
+    // Guaranteed shooting stars every 500ms — always 2+
+    let shootingStarsActive = true;
+    const shootingStarInterval = setInterval(() => {
+      if (!shootingStarsActive) return;
+      const w = window.innerWidth, h = window.innerHeight;
+      // Always spawn 2
+      spawnShootingStar(w, h);
+      setTimeout(() => { if (shootingStarsActive) spawnShootingStar(w, h); }, rand(50, 250));
+      // 60% chance of a 3rd
+      if (Math.random() < 0.6) {
+        setTimeout(() => { if (shootingStarsActive) spawnShootingStar(w, h); }, rand(250, 450));
+      }
+    }, 500);
+
+    // Full-page star explosion celebration
+    function celebrateGameComplete() {
+      const overlay = document.createElement('canvas');
+      overlay.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9999;pointer-events:none;';
+      document.body.appendChild(overlay);
+      const ctx = overlay.getContext('2d');
+      const dpr = devicePixelRatio;
+      overlay.width = window.innerWidth * dpr;
+      overlay.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const W = window.innerWidth, H = window.innerHeight;
+      const cx = W / 2, cy = H / 2;
+
+      // Flash
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:fixed;inset:0;background:rgba(200,230,255,0.15);z-index:9998;pointer-events:none;transition:opacity 0.6s;';
+      document.body.appendChild(flash);
+      setTimeout(() => { flash.style.opacity = '0'; }, 100);
+      setTimeout(() => flash.remove(), 700);
+
+      // Draw a star shape
+      function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
+        let rot = -Math.PI / 2;
+        let step = Math.PI / spikes;
+        ctx.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+          const r = i % 2 === 0 ? outerR : innerR;
+          ctx.lineTo(cx + Math.cos(rot) * r, cy + Math.sin(rot) * r);
+          rot += step;
+        }
+        ctx.closePath();
+      }
+
+      // Star particles — ALL star-shaped
+      const particles = [];
+      for (let i = 0; i < 100; i++) {
+        const angle = (Math.PI * 2 * i) / 100 + rand(-0.25, 0.25);
+        const speed = rand(2.5, 13);
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - rand(0, 2.5),
+          outerR: rand(3, 10),
+          spikes: Math.random() < 0.5 ? 4 : 6,
+          hue: rand(180, 310),
+          sat: rand(60, 90),
+          life: rand(55, 100),
+          t: 0,
+          gravity: rand(0.02, 0.07),
+          spin: rand(-0.08, 0.08),
+          rotation: rand(0, Math.PI * 2),
+          trail: []
+        });
+      }
+
+      // Expanding ring
+      let ringR = 0, ringAlpha = 0.7;
+      let frame = 0;
+
+      function animCelebration() {
+        ctx.clearRect(0, 0, W, H);
+        frame++;
+
+        // Expanding ring
+        ringR += 9;
+        ringAlpha *= 0.955;
+        if (ringAlpha > 0.01) {
+          ctx.beginPath();
+          ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+          ctx.strokeStyle = `hsla(210, 75%, 82%, ${ringAlpha})`;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          const g = ctx.createRadialGradient(cx, cy, ringR * 0.88, cx, cy, ringR);
+          g.addColorStop(0, 'rgba(0,0,0,0)');
+          g.addColorStop(0.5, `hsla(215, 65%, 85%, ${ringAlpha * 0.12})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Star particles
+        let alive = 0;
+        for (const p of particles) {
+          if (p.t >= p.life) continue;
+          alive++;
+          p.t++;
+          p.vy += p.gravity;
+          p.vx *= 0.992;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rotation += p.spin;
+          const fade = 1 - (p.t / p.life);
+          const scale = fade;
+
+          // Trail
+          p.trail.push({ x: p.x, y: p.y });
+          if (p.trail.length > 6) p.trail.shift();
+          for (let ti = 0; ti < p.trail.length - 1; ti++) {
+            const ta = (ti / p.trail.length) * fade * 0.3;
+            ctx.beginPath();
+            ctx.arc(p.trail[ti].x, p.trail[ti].y, p.outerR * 0.3 * scale, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, 80%, ${ta})`;
+            ctx.fill();
+          }
+
+          // Draw star
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = `hsla(${p.hue}, ${p.sat}%, 70%, ${fade * 0.6})`;
+          drawStar(ctx, 0, 0, p.spikes, p.outerR * scale, p.outerR * 0.4 * scale);
+          ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, 78%, ${fade})`;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // Inner glow
+          drawStar(ctx, 0, 0, p.spikes, p.outerR * 0.55 * scale, p.outerR * 0.25 * scale);
+          ctx.fillStyle = `hsla(${p.hue}, 40%, 95%, ${fade * 0.7})`;
+          ctx.fill();
+
+          // Cross sparkle on larger stars
+          if (p.outerR > 6 && fade > 0.3) {
+            const len = p.outerR * 2.5 * scale;
+            ctx.strokeStyle = `hsla(${p.hue}, 50%, 90%, ${fade * 0.4})`;
+            ctx.lineWidth = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(-len, 0); ctx.lineTo(len, 0);
+            ctx.moveTo(0, -len); ctx.lineTo(0, len);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        if (alive > 0 && frame < 130) {
+          requestAnimationFrame(animCelebration);
+        } else {
+          overlay.remove();
+        }
+      }
+      requestAnimationFrame(animCelebration);
     }
 
     const style = document.createElement('style');
     style.textContent = `
       @keyframes pop {
-        from { transform: translateY(8px) scale(.5); opacity: 0; }
-        to { transform: translateY(-14px) scale(1.4); opacity: 1; }
+        from { transform: translateY(8px) scale(.5) rotate(0deg); opacity: 0; }
+        to { transform: translateY(-18px) scale(1.5) rotate(20deg); opacity: 1; }
       }
     `;
     document.head.appendChild(style);
 
     resizeSky();
-    animateSky();
+    requestAnimationFrame(animateSky);
     window.addEventListener('resize', resizeSky);
+
+    // Star streaks: 2 glowing dots with trails fly left-to-right every 5 seconds
+    function spawnStarStreaks() {
+      for (let i = 0; i < 1; i++) {
+        const el = document.createElement('div');
+        el.className = 'star-streak';
+        const startY = (10 + Math.random() * 50);
+        el.style.setProperty('--start-y', startY + 'vh');
+        el.style.top = startY + 'vh';
+        el.style.animationDelay = (i * 0.8) + 's';
+        el.style.animationDuration = (8 + Math.random() * 4) + 's';
+        document.getElementById('star-container').appendChild(el);
+        setTimeout(() => el.remove(), 13000);
+      }
+    }
+    spawnStarStreaks();
+    const starStreakInterval = setInterval(spawnStarStreaks, 5000);
   </script>
 </body>
+
 </html>
