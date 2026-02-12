@@ -774,6 +774,7 @@
         <div class="btn-row" style="justify-content:center;">
           <button id="yesBtn">Yes, let's do it 💖</button>
           <button id="maybeBtn" class="subtle">I need a little time 🌙</button>
+          <button id="friendsBtn" class="subtle">Let's stay friends 🫂</button>
         </div>
         <p id="response" class="status"></p>
       </div>
@@ -1356,7 +1357,7 @@
       shootingStarsActive = false;
       clearInterval(shootingStarInterval);
       clearInterval(starStreakInterval);
-      const msg = `Hey ${state.name}, I made this little cosmic game because you genuinely brighten my days. Would you like to go on a real date with me?`;
+      const msg = `Hey ${state.name}, I made this little cosmic game because I've realized I really like you and enjoy being around you. Would you like to go on a real date with me?`;
       document.getElementById('datePlan').textContent = state.datePlan ? `Date planet idea: ${state.datePlan}` : '';
       showScene('final');
       typeWriter(document.getElementById('finalMessage'), msg, 32);
@@ -1381,6 +1382,12 @@
       const response = document.getElementById('response');
       response.className = 'status warn';
       response.textContent = 'Totally fair 💙 Thanks for taking the time to go through this universe.';
+    });
+    document.getElementById('friendsBtn').addEventListener('click', () => {
+      const response = document.getElementById('response');
+      response.className = 'status ok';
+      response.textContent = 'I value our friendship the most! Thanks for being honest 💛';
+      celebrateGameComplete();
     });
     document.getElementById('restart').addEventListener('click', () => window.location.reload());
 
@@ -1726,54 +1733,35 @@
         ctx.closePath();
       }
 
-      // Star particles — ALL star-shaped
+      // Star particles — ALL star-shaped (MORE STARRY!)
       const particles = [];
-      for (let i = 0; i < 100; i++) {
-        const angle = (Math.PI * 2 * i) / 100 + rand(-0.25, 0.25);
-        const speed = rand(2.5, 13);
+      for (let i = 0; i < 160; i++) { // Increased particle count
+        const angle = (Math.PI * 2 * i) / 160 + rand(-0.15, 0.15); // Even distribution
+        const speed = rand(3, 16);
         particles.push({
           x: cx, y: cy,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - rand(0, 2.5),
-          outerR: rand(3, 10),
-          spikes: Math.random() < 0.5 ? 4 : 6,
-          hue: rand(180, 310),
-          sat: rand(60, 90),
-          life: rand(55, 100),
+          vy: Math.sin(angle) * speed - rand(0, 3),
+          outerR: rand(4, 14), // Slightly larger stars
+          spikes: Math.random() < 0.3 ? 4 : (Math.random() < 0.6 ? 5 : 6), // 4, 5, or 6 spikes
+          hue: rand(180, 320),
+          sat: rand(70, 100), // More vibrant
+          life: rand(60, 110),
           t: 0,
-          gravity: rand(0.02, 0.07),
-          spin: rand(-0.08, 0.08),
+          gravity: rand(0.03, 0.09),
+          spin: rand(-0.15, 0.15), // Faster spin
           rotation: rand(0, Math.PI * 2),
           trail: []
         });
       }
 
-      // Expanding ring
-      let ringR = 0, ringAlpha = 0.7;
       let frame = 0;
 
       function animCelebration() {
         ctx.clearRect(0, 0, W, H);
         frame++;
 
-        // Expanding ring
-        ringR += 9;
-        ringAlpha *= 0.955;
-        if (ringAlpha > 0.01) {
-          ctx.beginPath();
-          ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
-          ctx.strokeStyle = `hsla(210, 75%, 82%, ${ringAlpha})`;
-          ctx.lineWidth = 2.5;
-          ctx.stroke();
-          const g = ctx.createRadialGradient(cx, cy, ringR * 0.88, cx, cy, ringR);
-          g.addColorStop(0, 'rgba(0,0,0,0)');
-          g.addColorStop(0.5, `hsla(215, 65%, 85%, ${ringAlpha * 0.12})`);
-          g.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // (Removed expanding ring logic)
 
         // Star particles
         let alive = 0;
@@ -1806,7 +1794,8 @@
           ctx.rotate(p.rotation);
           ctx.shadowBlur = 15;
           ctx.shadowColor = `hsla(${p.hue}, ${p.sat}%, 70%, ${fade * 0.6})`;
-          drawStar(ctx, 0, 0, p.spikes, p.outerR * scale, p.outerR * 0.4 * scale);
+          // Draw star (make innerR smaller for sharper points = more "starry")
+          drawStar(ctx, 0, 0, p.spikes, p.outerR * scale, p.outerR * 0.25 * scale);
           ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, 78%, ${fade})`;
           ctx.fill();
           ctx.shadowBlur = 0;
